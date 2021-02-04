@@ -122,10 +122,10 @@ def main():
             Cumulative_deaths = 0
             for j in range(len(weekwise_data[i][k])):
                 row = weekwise_data[i][k][j]
-                new_cases = my_mode(str(row[4]))[0]
-                Cumulative_cases = my_mode(str(row[5]))[0]
-                total_deaths = my_mode(str(row[6]))[0]
-                Cumulative_deaths = my_mode(str(row[7]))[0]
+                new_cases += row[4]
+                Cumulative_cases += row[5]
+                total_deaths += row[6]
+                Cumulative_deaths += row[7]
             our_row = None
             for x in range(len(data1)):
                 row = data1[x]
@@ -148,7 +148,7 @@ def main():
             stingeny(sheetObj, sheet, data1)
 
     df1 = pd.DataFrame(data1)
-    df1.to_excel('Covid5.xlsx', index=False)
+    df1.to_excel('Covid6.xlsx', index=False)
 
 
 def stingeny(sheetName, column_name, data1):
@@ -173,19 +173,34 @@ def stingeny(sheetName, column_name, data1):
 
     for i in weekwise_data.keys():
         for k in weekwise_data[i].keys():
-            # for j in range(len(weekwise_data[i][k])):
-            #     row = weekwise_data[i][k][j]
-            #     new_cases = my_mode(row)
-            new_cases =my_mode(str(weekwise_data[i][k]))
-            our_row = None
-            for x in range(len(data1)):
-                row = data1[x]
-                print(i, k)
-                if (row['Country'].lower() == i.lower() or (row['Country'] == 'Korea' and i == 'South Korea') or ((row['Country'] == 'Viet nam' or row['Country'] == 'Viet Nam') and i == 'Vietnam')) and \
-                        row['Week'] == k:
-                    our_row = row
-                    break
-            our_row[column_name] = new_cases
+            if column_name == 'stringency_index' or column_name == 'government_response_index' or column_name == 'containment_health_index' or column_name == 'economic_support_index':
+                new_cases = 0
+                for j in range(len(weekwise_data[i][k])):
+                    row = weekwise_data[i][k][j]
+                    print(row)
+                    new_cases += row
+                new_cases /= len(weekwise_data[i][k])
+                our_row = None
+                for x in range(len(data1)):
+                    row = data1[x]
+                    print(i, k)
+                    if (row['Country'].lower() == i.lower() or (row['Country'] == 'Korea' and i == 'South Korea') or ((row['Country'] == 'Viet nam' or row['Country'] == 'Viet Nam') and i == 'Vietnam')) and \
+                            row['Week'] == k:
+                        our_row = row
+                        break
+                our_row[column_name] = new_cases
+            else:
+                new_cases = my_mode(str(weekwise_data[i][k]))[0]
+                our_row = None
+                for x in range(len(data1)):
+                    row = data1[x]
+                    print(i, k)
+                    if (row['Country'].lower() == i.lower() or (row['Country'] == 'Korea' and i == 'South Korea') or (
+                            (row['Country'] == 'Viet nam' or row['Country'] == 'Viet Nam') and i == 'Vietnam')) and \
+                            row['Week'] == k:
+                        our_row = row
+                        break
+                our_row[column_name] = new_cases
 
 
 if __name__ == '__main__':
